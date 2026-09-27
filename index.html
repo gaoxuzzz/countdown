@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#FFF3E0" />
+<title>倒计时 · 合肥南站见 🍊</title>
+<style>
+  *,*::before,*::after{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif;
+    color:#4A2C17;
+    min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+
+  /* ===== 背景 ===== */
+  .bg{
+    position:fixed;inset:0;z-index:-2;overflow:hidden;
+    background:linear-gradient(165deg,#FFFBF5 0%,#FFEEDA 42%,#FFD9A8 100%);
+  }
+  .blob{position:absolute;border-radius:50%;filter:blur(72px);opacity:.55;}
+  .b1{width:360px;height:360px;background:#FFB347;top:-120px;left:-110px;}
+  .b2{width:320px;height:320px;background:#FB923C;bottom:-110px;right:-120px;opacity:.42;}
+  .b3{width:240px;height:240px;background:#FDE047;top:38%;right:-70px;opacity:.35;}
+
+  .fruit{
+    position:fixed;font-size:26px;opacity:.26;z-index:-1;
+    pointer-events:none;user-select:none;
+    animation:float 9s ease-in-out infinite;
+  }
+  .f1{left:5%;top:16%;}
+  .f2{right:7%;top:32%;font-size:20px;animation-delay:-3s;}
+  .f3{left:9%;bottom:12%;font-size:22px;animation-delay:-6s;}
+  @keyframes float{
+    0%,100%{transform:translateY(0) rotate(-6deg);}
+    50%{transform:translateY(-24px) rotate(8deg);}
+  }
+
+  /* ===== 布局 ===== */
+  .wrap{max-width:680px;margin:0 auto;padding:46px 20px 60px;position:relative;z-index:1;}
+
+  header{animation:rise .75s cubic-bezier(.22,.85,.3,1) both;}
+  .eyebrow{
+    display:inline-flex;align-items:center;gap:6px;
+    font-size:12.5px;font-weight:600;letter-spacing:.06em;color:#C2410C;
+    background:rgba(255,255,255,.75);
+    border:1px solid rgba(253,186,116,.8);
+    padding:7px 14px;border-radius:999px;
+    backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  }
+  h1{
+    font-size:clamp(28px,7.5vw,42px);line-height:1.15;
+    margin:16px 0 10px;font-weight:800;letter-spacing:-.02em;
+    background:linear-gradient(115deg,#7C2D12 0%,#EA580C 55%,#F59E0B 100%);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .sub{margin:0;font-size:14px;color:#9A6B4B;}
+
+  .card{
+    border-radius:28px;
+    background:rgba(255,255,255,.68);
+    backdrop-filter:blur(20px) saturate(1.2);
+    -webkit-backdrop-filter:blur(20px) saturate(1.2);
+    border:1px solid rgba(255,255,255,.9);
+    box-shadow:0 26px 55px -28px rgba(180,83,9,.5),
+               inset 0 1px 0 rgba(255,255,255,.9);
+  }
+
+  /* ===== 倒计时 ===== */
+  .cd-card{margin-top:30px;padding:26px 20px 20px;animation:rise .75s .06s cubic-bezier(.22,.85,.3,1) both;}
+  .cd-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+  .cd-cell{
+    padding:14px 4px 10px;border-radius:20px;text-align:center;
+    background:linear-gradient(180deg,#FFFFFF 0%,#FFF1DE 100%);
+    border:1px solid rgba(253,186,116,.55);
+    box-shadow:0 8px 18px -12px rgba(234,88,12,.6);
+  }
+  .cd-num{
+    display:block;font-size:clamp(28px,8.6vw,44px);font-weight:800;line-height:1;
+    font-variant-numeric:tabular-nums;letter-spacing:-.03em;
+    background:linear-gradient(180deg,#FDBA74 0%,#EA580C 100%);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .cd-unit{display:block;margin-top:8px;font-size:11.5px;font-weight:600;color:#B4713F;letter-spacing:.12em;}
+
+  .cd-foot{
+    margin-top:18px;padding-top:14px;
+    border-top:1px dashed rgba(251,146,60,.45);
+    display:flex;justify-content:space-between;align-items:center;
+    gap:10px;flex-wrap:wrap;font-size:13px;color:#9A6B4B;
+  }
+  .cd-foot #footRight{font-variant-numeric:tabular-nums;font-weight:600;color:#C2410C;}
+
+  /* ===== 时间线 ===== */
+  .tl-card{margin-top:20px;padding:24px 20px 14px;animation:rise .75s .14s cubic-bezier(.22,.85,.3,1) both;}
+  .tl-card h2{
+    margin:0 0 22px;font-size:15px;font-weight:700;color:#7C2D12;
+    display:flex;align-items:center;gap:9px;letter-spacing:.02em;
+  }
+  .h2-dot{
+    width:8px;height:8px;border-radius:50%;
+    background:linear-gradient(135deg,#FDBA74,#F97316);
+    box-shadow:0 0 0 4px rgba(253,186,116,.28);
+  }
+
+  .timeline{list-style:none;margin:0;padding:0;}
+  .tl-item{
+    position:relative;
+    display:grid;grid-template-columns:46px 1fr;gap:15px;
+    padding-bottom:20px;
+  }
+  .tl-item:last-child{padding-bottom:8px;}
+  .tl-item:not(:last-child)::before{
+    content:"";position:absolute;left:22px;top:48px;bottom:0;width:2px;
+    border-radius:2px;
+    background:linear-gradient(180deg,#FDBA74,#FFE8CF);
+  }
+
+  .tl-dot{
+    width:46px;height:46px;border-radius:50%;
+    display:grid;place-items:center;font-size:19px;
+    background:#FFF6EA;border:1.5px solid #FED7AA;
+    position:relative;z-index:1;
+    transition:background .35s ease,border-color .35s ease,box-shadow .35s ease,opacity .35s ease;
+  }
+  .tl-item.done .tl-dot{
+    background:linear-gradient(135deg,#FFE8CC,#FFD3A0);
+    border-color:#FDBA74;opacity:.9;
+  }
+  .tl-item.active .tl-dot{
+    background:linear-gradient(135deg,#FDBA74,#F97316);
+    border-color:#FFF7ED;
+    animation:pulse 2.4s ease-out infinite;
+  }
+  @keyframes pulse{
+    0%{box-shadow:0 0 0 0 rgba(249,115,22,.45),0 10px 22px -10px rgba(249,115,22,.85);}
+    70%{box-shadow:0 0 0 16px rgba(249,115,22,0),0 10px 22px -10px rgba(249,115,22,.85);}
+    100%{box-shadow:0 0 0 0 rgba(249,115,22,0),0 10px 22px -10px rgba(249,115,22,.85);}
+  }
+
+  .tl-body{min-width:0;padding-top:1px;}
+  .tl-head{display:flex;align-items:center;gap:9px;flex-wrap:wrap;}
+  .tl-time{
+    font-size:20px;font-weight:800;letter-spacing:-.02em;line-height:1.1;
+    font-variant-numeric:tabular-nums;color:#9A3412;
+  }
+  .tl-tag{
+    font-size:11px;font-weight:600;color:#C2410C;
+    background:#FFEDD5;border:1px solid #FED7AA;
+    padding:2px 9px;border-radius:999px;white-space:nowrap;
+  }
+  .tl-title{margin-top:3px;font-size:14.5px;font-weight:700;color:#431407;}
+  .tl-desc{margin-top:2px;font-size:12.5px;color:#9A6B4B;line-height:1.5;}
+
+  .tl-item.done .tl-time{color:#B4713F;}
+  .tl-item.done .tl-title{color:#8B5E3C;font-weight:600;}
+  .tl-item.done .tl-desc{color:#C0A48D;}
+  .tl-item.done .tl-tag{color:#B4713F;background:#FFF4E6;border-color:#FDE3C4;}
+
+  .tl-item.active .tl-time{color:#EA580C;}
+  .tl-item.active .tl-title{color:#7C2D12;}
+
+  .foot{
+    margin-top:26px;text-align:center;
+    font-size:13px;color:#B4825C;letter-spacing:.03em;
+    animation:rise .75s .22s cubic-bezier(.22,.85,.3,1) both;
+  }
+
+  @keyframes rise{
+    from{opacity:0;transform:translateY(16px);}
+    to{opacity:1;transform:translateY(0);}
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation:none !important;}
+  }
+</style>
+</head>
+<body>
+
+<div class="bg">
+  <div class="blob b1"></div>
+  <div class="blob b2"></div>
+  <div class="blob b3"></div>
+</div>
+<span class="fruit f1">🍊</span>
+<span class="fruit f2">🍊</span>
+<span class="fruit f3">🍊</span>
+
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow">🍊 倒计时 · 赴一场见面</div>
+    <h1>合肥南站见</h1>
+    <p class="sub">2026年9月30日 21:42 · 出站口见 💛</p>
+  </header>
+
+  <section class="card cd-card">
+    <div class="cd-grid">
+      <div class="cd-cell"><span class="cd-num" id="d">00</span><span class="cd-unit">天</span></div>
+      <div class="cd-cell"><span class="cd-num" id="h">00</span><span class="cd-unit">时</span></div>
+      <div class="cd-cell"><span class="cd-num" id="m">00</span><span class="cd-unit">分</span></div>
+      <div class="cd-cell"><span class="cd-num" id="s">00</span><span class="cd-unit">秒</span></div>
+    </div>
+    <div class="cd-foot">
+      <span id="footLeft">🍊 正在奔赴</span>
+      <span id="footRight"></span>
+    </div>
+  </section>
+
+  <section class="card tl-card">
+    <h2><span class="h2-dot"></span>行程时间线</h2>
+    <ul class="timeline" id="timeline"></ul>
+  </section>
+
+  <footer class="foot">🍊 一路顺风，我在出站口等你</footer>
+
+</div>
+
+<script>
+(function () {
+  /* ========= 只改这里就可以换时间 ========= */
+  const MEET_ISO = '2026-09-30T21:42:00+08:00';   // 见面时刻（北京时间）
+
+  const STOPS = [
+    { t:'19:36', iso:'2026-09-30T19:36:00+08:00', icon:'🎫', tag:'湾沚南站', title:'检票进站',   desc:'身份证拿好，别跑错站台' },
+    { t:'19:51', iso:'2026-09-30T19:51:00+08:00', icon:'🚄', tag:'05车 12B', title:'上车',       desc:'找到 05 车厢 12B 号座位' },
+    { t:'20:03', iso:'2026-09-30T20:03:00+08:00', icon:'🏙️', tag:'宣城站',   title:'到达宣城站', desc:'下车，走换乘通道' },
+    { t:'20:20', iso:'2026-09-30T20:20:00+08:00', icon:'🎫', tag:'宣城站',   title:'换乘检票',   desc:'二次检票，留意站台指示' },
+    { t:'20:35', iso:'2026-09-30T20:35:00+08:00', icon:'🚄', tag:'06车 11F', title:'上车',       desc:'找到 06 车厢 11F 号座位' },
+    { t:'21:42', iso:'2026-09-30T21:42:00+08:00', icon:'💛', tag:'合肥南站', title:'到达 · 见面啦', desc:'出站口见，我在这儿等你 🍊' }
+  ];
+  /* ======================================= */
+
+  const MEET = new Date(MEET_ISO).getTime();
+  const el = id => document.getElementById(id);
+
+  const dEl = el('d'), hEl = el('h'), mEl = el('m'), sEl = el('s');
+  const footLeft = el('footLeft'), footRight = el('footRight');
+  const timeline = el('timeline');
+
+  // 渲染时间线
+  const items = STOPS.map(stop => {
+    const li = document.createElement('li');
+    li.className = 'tl-item';
+    li.innerHTML =
+      '<div class="tl-dot">' + stop.icon + '</div>' +
+      '<div class="tl-body">' +
+        '<div class="tl-head">' +
+          '<span class="tl-time">' + stop.t + '</span>' +
+          '<span class="tl-tag">' + stop.tag + '</span>' +
+        '</div>' +
+        '<div class="tl-title">' + stop.title + '</div>' +
+        '<div class="tl-desc">' + stop.desc + '</div>' +
+      '</div>';
+    timeline.appendChild(li);
+    return li;
+  });
+
+  const pad = n => String(n).padStart(2, '0');
+
+  function tick() {
+    const now = Date.now();
+    const remain = MEET - now;
+    const totalSec = Math.max(0, Math.floor(remain / 1000));
+
+    dEl.textContent = pad(Math.floor(totalSec / 86400));
+    hEl.textContent = pad(Math.floor((totalSec % 86400) / 3600));
+    mEl.textContent = pad(Math.floor((totalSec % 3600) / 60));
+    sEl.textContent = pad(totalSec % 60);
+
+    if (remain > 0) {
+      footLeft.textContent = '🍊 正在奔赴';
+      footRight.textContent = '还有 ' + Math.ceil(remain / 60000) + ' 分钟';
+    } else {
+      footLeft.textContent = '🍊 到站啦，见面！';
+      footRight.textContent = '欢迎来到合肥';
+    }
+
+    // 时间线状态：已过 = done，下一个 = active
+    let activeSet = false;
+    STOPS.forEach((stop, i) => {
+      const ts = new Date(stop.iso).getTime();
+      const li = items[i];
+      li.classList.remove('done', 'active');
+      if (ts <= now) {
+        li.classList.add('done');
+      } else if (!activeSet) {
+        li.classList.add('active');
+        activeSet = true;
+      }
+    });
+  }
+
+  tick();
+  setInterval(tick, 1000);
+})();
+</script>
+</body>
+</html>
